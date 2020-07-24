@@ -177,15 +177,12 @@ struct Loading: View {
         ZStack {
             Blur(style: .systemUltraThinMaterial)
             
-            if #available(iOS 14.0, *) {
-                ProgressView("Aguarde...")
-            } else {
-                VStack {
-                    Indicator()
-                    Text("Aguarde")
-                        .padding(.top, 8)
-                }
+            VStack {
+                Indicator()
+                Text("Aguarde")
+                    .padding(.top, 8)
             }
+            
         }
         .frame(width: 110, height: 110)
         .cornerRadius(15)
@@ -206,42 +203,21 @@ struct CardView : View {
             // going to implement close button...
             
             ZStack(alignment: .topTrailing) {
-                if self.expand {
-                    if #available(iOS 14.0, *) {
-                        WebImage(url: URL(string: self.data.urls["thumb"]!))
-                            .resizable()
-                            .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
-                            .animation(.easeIn)
-                        
-                    } else {
-                        AnimatedImage(url: URL(string: self.data.urls["thumb"]!))
-                            .resizable()
-                            .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
-                            .animation(.easeIn)
-                    }
-                        
-                    
-                    Blur(style: .systemMaterial).edgesIgnoringSafeArea(.all)
-                        .animation(nil)
-                }
+                AnimatedImage(url: URL(string: self.data.urls["thumb"]!))
+                    .resizable()
+                    .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
+                    .animation(.easeIn)
+                
+                Blur(style: .systemMaterial).edgesIgnoringSafeArea(.all)
+                    .animation(nil)
                 
                 VStack {
                     ZStack(alignment: .bottomTrailing) {
-                        if #available(iOS 14.0, *) {
-                            WebImage(url: URL(string: self.data.urls["small"]!))
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: self.expand ? (UIDevice.current.userInterfaceIdiom == .pad ? 550 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 250 : 350)) : (UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250)))
-                                .cornerRadius(self.expand ? 0 : 10)
-                        } else {
                         AnimatedImage(url: URL(string: self.data.urls["small"]!))
                             .resizable()
                             .scaledToFill()
                             .frame(height: self.expand ? (UIDevice.current.userInterfaceIdiom == .pad ? 550 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 250 : 350)) : (UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250)))
                             .cornerRadius(self.expand ? 0 : 10)
-                        }
-                            
-                            
                         
                         Text(self.expand ? self.data.formattedDate : (self.data.user.name ?? "Desconhecido"))
                             .font(.caption)
@@ -259,24 +235,13 @@ struct CardView : View {
                     if self.expand {
                         
                         HStack{
-                            if #available(iOS 14.0, *) {
-                                 WebImage(url: URL(string: self.data.user.profile_image!["small"]!))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(Circle())
-                                    .overlay(Circle().stroke(Color.white, lineWidth: 0.5))
-                                    .shadow(radius: 8)
-                            } else {
-                                AnimatedImage(url: URL(string: self.data.user.profile_image!["small"] ?? ""))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(Circle())
-                                    .overlay(Circle().stroke(Color.white, lineWidth: 0.5))
-                                    .shadow(radius: 8)
-                            }
-                                
+                            AnimatedImage(url: URL(string: self.data.user.profile_image!["small"] ?? ""))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 0.5))
+                                .shadow(radius: 8)
                             
                             Text(self.data.user.name ?? "Desconhecido")
                                 .font(.title)
