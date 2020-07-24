@@ -37,20 +37,14 @@ struct ContentView: View {
                                 }
                                 .padding([.top, .horizontal], 30)
                                 
-                       //         if self.getData.shimmer {
-                                    
-                       //         } else {
+
                                 ForEach(0..<self.getData.images.count) { j in
                                     
                                     GeometryReader { g in
 
                                         ZStack {
                                             Shimmer()
-//                                            .onAppear {
-//                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                                                    self.getData.shimmer = false
-//                                                }
-//                                            }
+
                                         
                                         CardView(data: self.$getData.images[j], expand: self.$getData.expand[j].expand, hero: self.$hero, indexWeb: self.$getData.indexWeb, showWeb: self.$getData.showWeb, saveImage: self.$saveImage)
                                             .offset(y: self.getData.expand[j].expand ? -g.frame(in: .global).minY : 0)
@@ -203,13 +197,15 @@ struct CardView : View {
             // going to implement close button...
             
             ZStack(alignment: .topTrailing) {
-                AnimatedImage(url: URL(string: self.data.urls["thumb"]!))
-                    .resizable()
-                    .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
-                    .animation(.easeIn)
-                
-                Blur(style: .systemMaterial).edgesIgnoringSafeArea(.all)
-                    .animation(nil)
+                if self.expand {
+                    AnimatedImage(url: URL(string: self.data.urls["thumb"]!))
+                        .resizable()
+                        .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
+                  //      .animation(.easeIn)
+                    
+                    Blur(style: .systemMaterial).edgesIgnoringSafeArea(.all)
+                  //     .animation(nil)
+                }
                 
                 VStack {
                     ZStack(alignment: .bottomTrailing) {
