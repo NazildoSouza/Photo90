@@ -17,169 +17,185 @@ struct ContentView: View {
     @State private var dragAmount = CGSize.zero
     
     var body: some View {
-        
+
         ZStack(alignment: .topTrailing) {
-            if self.getData.statusCode != 200 {
-                Loading()
+            
+            if !self.getData.expand.isEmpty && !self.getData.images.isEmpty && self.getData.statusCode == 200 {
+                    
+                ScrollView(.vertical, showsIndicators: false) {
+                    HStack {
+                        Text("Photo90")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                    }
+                    .padding([.top, .horizontal], 30)
+                    
+                    
+                    ForEach(0..<self.getData.images.count) { j in
+                        
+                        GeometryReader { g in
 
-            } else {
-                VStack {
-                    if !self.getData.expand.isEmpty && !self.getData.images.isEmpty && self.getData.statusCode == 200 {
-                        GeometryReader { geo in
-                            
-                            ScrollView(.vertical, showsIndicators: false) {
-                                HStack {
-                                    Text("Photo90")
-                                        .font(.title)
-                                        .fontWeight(.bold)
-                                    
-                                    Spacer()
-                                }
-                                .padding([.top, .horizontal], 30)
-                                
-
-                                ForEach(0..<self.getData.images.count) { j in
-                                    
-                                    GeometryReader { g in
-
-                                        ZStack {
-                                            Shimmer()
-
-                                        
-                                        CardView(data: self.$getData.images[j], expand: self.$getData.expand[j].expand, hero: self.$hero, indexWeb: self.$getData.indexWeb, showWeb: self.$getData.showWeb, saveImage: self.$saveImage)
-                                            .offset(y: self.getData.expand[j].expand ? -g.frame(in: .global).minY : 0)
-                                            .opacity(self.hero ? (self.getData.expand[j].expand ? 1 : 0) : 1)
-                                            .onTapGesture {
-                                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.8, blendDuration: 0)){
-                                                    if !self.getData.expand[j].expand{
-                                                        self.getData.indexSet = j
-                                                        
-                                                        // opening only one time then close button will work...
-                                                        self.getData.expand[j].expand.toggle()
-                                                        self.hero.toggle()
-                                                    }
-                                                }
-                                        }
-                              //          .opacity(self.getData.shimmer ? 0 : 1)
+                            CardView(data: self.$getData.images[j], expand: self.$getData.expand[j].expand, hero: self.$hero, indexWeb: self.$getData.indexWeb, showWeb: self.$getData.showWeb, saveImage: self.$saveImage)
+                                .offset(y: self.getData.expand[j].expand ? -g.frame(in: .global).minY : 0)
+                                .opacity(self.hero ? (self.getData.expand[j].expand ? 1 : 0) : 1)
+                                .onTapGesture {
+                                    withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.8, blendDuration: 0)){
+                                        if !self.getData.expand[j].expand{
+                                            self.getData.indexSet = j
                                             
+                                            // opening only one time then close button will work...
+                                            self.getData.expand[j].expand.toggle()
+                                            self.hero.toggle()
                                         }
+                                    }
+                                }
+                            
+                        }
+                        .frame(height: self.getData.expand[j].expand ? UIScreen.main.bounds.height : (UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250)))
+                        
+                        .simultaneousGesture(DragGesture(minimumDistance: self.getData.expand[j].expand ? 0 : 500)
+                            .onChanged { self.dragAmount = $0.translation }
+                            .onEnded { value in
+                                if self.dragAmount.height > 150 {
+                                    withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.8, blendDuration: 0)){
+                                        
+                                        self.getData.expand[j].expand.toggle()
+                                        self.hero.toggle()
+                                        self.dragAmount = .zero
                                         
                                     }
-                                    .frame(height: self.getData.expand[j].expand ? UIScreen.main.bounds.height : (UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250)))
-                                        
-                                    .simultaneousGesture(DragGesture(minimumDistance: self.getData.expand[j].expand ? 0 : 500)
-                                    .onChanged { self.dragAmount = $0.translation }
-                                    .onEnded { value in
-                                        if self.dragAmount.height > 150 {
-                                            withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.8, blendDuration: 0)){
-                                                
-                                                self.getData.expand[j].expand.toggle()
-                                                self.hero.toggle()
-                                                self.dragAmount = .zero
-                                                
-                                            }
-                                        } else {
-                                            self.dragAmount = .zero
-                                        }
-                                        
-                                        }
-                                    )
-                                    
+                                } else {
+                                    self.dragAmount = .zero
                                 }
-                          //      }
                                 
-                                HStack {
-                                    if self.getData.isSearching {
-                                        Text("Página: \(self.getData.page)")
-                                            .font(.headline)
-                                            .fontWeight(.bold)
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            self.getData.statusCode = 0
-                                            self.getData.page += 1
-                                            self.getData.shimmer = true
-                                            self.getData.loadSearch()
-                                        }) {
-                                            Text("Próximo")
-                                                .font(.headline)
-                                                .fontWeight(.bold)
-                                        }
-                                    } else {
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            self.getData.statusCode = 0
-                                            self.showSearch = false
-                                            self.getData.shimmer = true
-                                            self.getData.loadData()
-                                        }) {
-                                            Text("Próximo")
-                                                .font(.headline)
-                                                .fontWeight(.bold)
-                                        }
-                                    }
-                                    
-                                }
-                                .padding(.vertical, 20)
-                                .padding(.horizontal, 35)
+                            }
+                        )
+                        
+                    }
+                    
+                    HStack {
+                        if self.getData.isSearching {
+                            Text("Página: \(self.getData.page)")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                self.getData.statusCode = 0
+                                self.getData.page += 1
+                                self.getData.loadSearch()
+                            }) {
+                                Text("Próximo")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                            }
+                        } else {
+                            Spacer()
+                            
+                            Button(action: {
+                                self.getData.statusCode = 0
+                                self.showSearch = false
+                                self.getData.loadData()
+                            }) {
+                                Text("Próximo")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
                             }
                         }
                         
-                    } else {
-                        GeometryReader { g in
-                            Text("Sem Resultados.")
-                                .font(.headline)
-                        }
                     }
+                    .padding(.vertical, 20)
+                    .padding(.horizontal, 35)
                 }
+                
+            } else if self.getData.expand.isEmpty && self.getData.images.isEmpty && self.getData.statusCode == 200 {
+                
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("Sem Resultados.")
+                            .font(.headline)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                
+            }
+            
+            if self.getData.statusCode == 200 && self.getData.alert == false {
                 
                 Search(getData: self.getData, search: self.$getData.search, showSearch: self.$showSearch)
                     .padding(.top, 15)
                     .padding(.horizontal, 30)
-                    //  .offset(y: UIDevice.current.userInterfaceIdiom == .pad ? 65 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 45 : 55))
                     .opacity(self.hero ? 0 : 1)
                 
             }
+            
+            if self.getData.statusCode != 200 && self.getData.alert == false {
+
+                ZStack {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        HStack {
+                            Text("Photo90")
+                                .font(.title)
+                                .fontWeight(.bold)
+                            
+                            Spacer()
+                        }
+                        .padding([.top, .horizontal], 30)
+                        
+                        ForEach(0..<6) { _ in
+
+                            Shimmer()
+
+                        }
+                    }
+                    
+                    VStack {
+                        HStack {
+                            Spacer(minLength: 0)
+                            Search(getData: self.getData, search: self.$getData.search, showSearch: self.$showSearch)
+                                .padding(.top, 15)
+                                .padding(.horizontal, 30)
+                                .opacity(self.hero ? 0 : 1)
+                        }
+                        Spacer()
+                    }
+                    
+                    Color.black.opacity(0.35).edgesIgnoringSafeArea(.all)
+
+                    LottieView(fileName: "3317-loading")
+                        .frame(width: 360, height: 450)
+
+                }
+
+            }
+            
         }
         .sheet(isPresented: self.$getData.showWeb) {
             WebView(getData: self.getData, photo: self.getData.images[self.getData.indexSet])
         }
+        
         .actionSheet(isPresented: self.$saveImage) {
             ActionSheet(title: Text("Salvar Imagem"), message: Text("Deseja salvar a imagem em sua biblioteca ?"), buttons: [.default(Text("Salvar")) { SDWebImageDownloader().downloadImage(with: URL(string: self.getData.images[self.getData.indexSet].urls["small"]!)) { (image, _, _, _) in
                 UIImageWriteToSavedPhotosAlbum(image!, nil, nil, nil)
-                } }, .cancel(Text("Cancelar"))])
+            } }, .cancel(Text("Cancelar"))])
         }
-            
+        
         .alert(isPresented: self.$getData.alert) {
             Alert(title: Text("Erro"), message: Text(self.getData.msgError), dismissButton: .default(Text("Ok")) { self.getData.loadData() })
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
-    }
-}
-
-struct Loading: View {
-    
-    var body: some View {
-        ZStack {
-            Blur(style: .systemUltraThinMaterial)
-            
-            VStack {
-                Indicator()
-                Text("Aguarde")
-                    .padding(.top, 8)
-            }
-            
-        }
-        .frame(width: 110, height: 110)
-        .cornerRadius(15)
     }
 }
 
@@ -198,20 +214,24 @@ struct CardView : View {
             
             ZStack(alignment: .topTrailing) {
                 if self.expand {
-                    AnimatedImage(url: URL(string: self.data.urls["thumb"]!))
+                    AnimatedImage(url: URL(string: self.data.urls["small"]!))
                         .resizable()
-                        .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
-                  //      .animation(.easeIn)
+                        .overlay(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear, Color.clear, Color.black, Color.black]), startPoint: .top, endPoint: .bottom))
                     
                     Blur(style: .systemMaterial).edgesIgnoringSafeArea(.all)
-                  //     .animation(nil)
+                    
                 }
                 
                 VStack {
                     ZStack(alignment: .bottomTrailing) {
                         AnimatedImage(url: URL(string: self.data.urls["small"]!))
                             .resizable()
+                            .placeholder {
+                                Rectangle().foregroundColor(Color("Color"))
+                            }
+                            .indicator(SDWebImageActivityIndicator.medium)
                             .scaledToFill()
+                            .transition(.fade(duration: 0.5))
                             .frame(height: self.expand ? (UIDevice.current.userInterfaceIdiom == .pad ? 550 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 250 : 350)) : (UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250)))
                             .cornerRadius(self.expand ? 0 : 10)
                         
@@ -231,8 +251,9 @@ struct CardView : View {
                     if self.expand {
                         
                         HStack{
-                            AnimatedImage(url: URL(string: self.data.user.profile_image!["small"] ?? ""))
+                            WebImage(url: URL(string: self.data.user.profile_image!["small"] ?? ""))
                                 .resizable()
+                                .placeholder(Image(systemName: "person.circle")) // Placeholder Image
                                 .scaledToFill()
                                 .frame(width: 50, height: 50)
                                 .clipShape(Circle())
@@ -250,6 +271,7 @@ struct CardView : View {
                         Text("\(self.data.description ?? "")\n\(self.data.alt_description ?? "")")
                             .padding([.top, .horizontal])
                             .layoutPriority(1)
+                            .lineLimit(4)
                         
                         Spacer(minLength: 10)
                         
@@ -283,8 +305,8 @@ struct CardView : View {
                             
                             Button(action: {
                                 if UIDevice.current.userInterfaceIdiom == .phone {
-                                let shared = UIActivityViewController(activityItems: [self.data.links["html"] ?? self.data.user.portfolio_url ?? "sem site"], applicationActivities: nil)
-                                UIApplication.shared.windows.first?.rootViewController?.present(shared, animated: true, completion: nil)
+                                    let shared = UIActivityViewController(activityItems: [self.data.links["html"] ?? self.data.user.portfolio_url ?? "sem site"], applicationActivities: nil)
+                                    UIApplication.shared.windows.first?.rootViewController?.present(shared, animated: true, completion: nil)
                                 }
                             }) {
                                 
@@ -345,8 +367,8 @@ struct CardView : View {
                     }
                     
                 }
-                    // to ignore spacer scroll....
-                    .contentShape(Rectangle())
+                // to ignore spacer scroll....
+                .contentShape(Rectangle())
                 
                 // showing only when its expanded...
                 
@@ -396,7 +418,6 @@ struct Search: View {
                         self.getData.isSearching = true
                         self.getData.statusCode = 0
                         self.getData.page = 1
-                        self.getData.shimmer = true
                         self.getData.loadSearch()
                     }
                 }) {
@@ -407,7 +428,6 @@ struct Search: View {
                     if self.getData.isSearching {
                         self.getData.isSearching = false
                         self.getData.statusCode = 0
-                        self.getData.shimmer = true
                         self.search = ""
                         withAnimation {
                             self.showSearch = false
@@ -433,7 +453,7 @@ struct Search: View {
                 }) {
                     Image(systemName: "magnifyingglass")
                         .imageScale(.large)
-                        .padding(20)
+                        .padding(18)
                 }
             }
         }
@@ -443,17 +463,6 @@ struct Search: View {
         
     }
     
-}
-
-struct Indicator: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIActivityIndicatorView {
-        let view = UIActivityIndicatorView(style: .large)
-        view.startAnimating()
-        return view
-    }
-    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {
-        
-    }
 }
 
 struct Blur: UIViewRepresentable {

@@ -20,13 +20,12 @@ class GetData: ObservableObject {
     @Published var indexSet = 0
     @Published var indexWeb = 0
     @Published var showWeb = false
-    @Published var shimmer = true
     
     init() {
         self.loadData()
     }
     
-    let key = "wjP78ukrCmc1hwZZfLkdWYbFAlW58b4GFU0zuMEfIsw"
+    private let key = "wjP78ukrCmc1hwZZfLkdWYbFAlW58b4GFU0zuMEfIsw"
     
     func loadData() {
         

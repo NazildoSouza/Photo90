@@ -10,34 +10,34 @@ import SwiftUI
 
 struct Shimmer: View {
     @State private var show = false
-    var center = (UIScreen.main.bounds.width)
+    var center = UIScreen.main.bounds.width
     
     var body: some View {
-        GeometryReader { _ in
-            ZStack {
-                Color("Color")
-                    .frame(height: 250)
-                    .cornerRadius(10)
-                
-                Color("Color2")
-                    .frame(height: 250)
-                    .cornerRadius(10)
-                    .mask(
-                        
-                        Rectangle()
-                            .fill(
-                                LinearGradient(gradient: .init(colors: [.clear, Color.white.opacity(0.48), .clear]), startPoint: .top, endPoint: .bottom)
+        ZStack {
+            Color("Color")
+                .frame(height: UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250))
+                .cornerRadius(10)
+            
+            Color("Color2")
+                .frame(height: UIDevice.current.userInterfaceIdiom == .pad ? 400 : (UIDevice.current.name == "iPhone SE (2nd generation)" ? 150 : 250))
+                .cornerRadius(10)
+                .mask(
+                    
+                    Rectangle()
+                        .fill(
+                            LinearGradient(gradient: .init(colors: [.clear, Color.white.opacity(0.48), .clear]), startPoint: .top, endPoint: .bottom)
                         )
-                            .rotationEffect(.init(degrees: 70))
-                            .offset(x: self.show ? self.center : -self.center)
-                        
+                        .rotationEffect(.init(degrees: 70))
+                        .offset(x: self.show ? self.center : -self.center)
+                    
                 )
-            }
-            .padding(.horizontal, 20)
         }
+        .padding(.horizontal, 20)
         .onAppear {
             withAnimation(Animation.default.speed(0.28).delay(0).repeatForever(autoreverses: false)) {
-                self.show.toggle()
+                if #available(iOS 14.0, *) {
+                    self.show.toggle()
+                }
             }
         }
     }
